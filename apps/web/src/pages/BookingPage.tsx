@@ -252,7 +252,11 @@ function SlotPicker({ owner, eventType, slots, now }: SlotPickerProps) {
             <ul className="slots">
               {daySlots.map((slot) => {
                 const free = slot.status === 'free';
+                // Статус от API авторитетен: free не перекрашивается по часам
+                // браузера; busy с наступившим началом — прошедший, а не занятый.
+                const past = !free && Date.parse(slot.start) < now.getTime();
                 const time = formatTime(slot.start, tz);
+                const label = free ? 'Свободно' : past ? 'Прошло' : 'Занято';
                 return (
                   <li key={slot.start}>
                     <button
@@ -263,7 +267,7 @@ function SlotPicker({ owner, eventType, slots, now }: SlotPickerProps) {
                       onClick={() => setPickedStart(slot.start)}
                     >
                       <span>{time}</span>
-                      <small>{free ? 'Свободно' : 'Занято'}</small>
+                      <small>{label}</small>
                     </button>
                   </li>
                 );
