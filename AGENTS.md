@@ -34,7 +34,7 @@ OpenCode-агент вызывается комментарием `/oc` в issue
 
 Новые issues от владельца/коллабораторов автоматически разбирает `.github/workflows/opencode-triage.yml`.
 
-Pull request автоматически ревьюит `.github/workflows/opencode-review.yml`: ревьюятся PR из веток этого репозитория, включая PR агента; форки и release-PR пропускаются.
+Pull request автоматически ревьюит `.github/workflows/opencode-review.yml`: ревьюятся PR из веток этого репозитория, включая PR агента; форки и release-PR пропускаются. Ревью запускается на opened/reopened/ready_for_review (без synchronize, экономия бюджета OpenCode) — повторное ревью вызывается reopen'ом PR.
 
 Ежедневно в 03:00 МСК и вручную (workflow_dispatch) `.github/workflows/opencode-lighthouse.yml` проверяет `vars.APP_URL` через Lighthouse, отчёт — артефакт `lighthouse-report` и issue «Lighthouse-отчёт».
 
