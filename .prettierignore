@@ -1,0 +1,11 @@
+dist
+test-results
+playwright-report
+coverage
+pnpm-lock.yaml
+.github
+CHANGELOG.md
+.release-please-manifest.json
+.agents/
+.claude/skills/
+packages/api-client/src/schema.d.ts
