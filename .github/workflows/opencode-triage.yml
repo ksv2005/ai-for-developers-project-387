@@ -1,0 +1,36 @@
+name: opencode-triage
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage:
+    if: contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: read
+      issues: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Run opencode
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
+        with:
+          model: opencode/kimi-k3
+          prompt: |
+            Ты разбираешь новую задачу в сервисе бронирования звонков. Прочитай AGENTS.md, GLOSSARY.md и docs/adr/. Оставь ОДИН комментарий по-русски:
+            1) суть проблемы своими словами;
+            2) вероятная причина;
+            3) затронутые файлы и модули;
+            4) предлагаемый путь исправления;
+            5) противоречит ли запрос GLOSSARY.md или ADR (со ссылкой) — если да, скажи прямо;
+            6) рекомендуемый лейбл из docs/agents/triage-labels.md (ready-for-agent / needs-info / wontfix) и чего не хватает в описании.
+            Код не меняй, веток и PR не создавай.

@@ -32,6 +32,8 @@ pnpm workspace, запускать из корня (Node >= 24.21, см. `.nvmrc
 
 OpenCode-агент вызывается комментарием `/oc` в issue или PR — срабатывает только для владельца и коллабораторов репозитория (проверка `author_association` в условии job'а). Воркфлоу: `.github/workflows/opencode.yml`, модель задаётся в нём.
 
+Новые issues от владельца/коллабораторов автоматически разбирает `.github/workflows/opencode-triage.yml`.
+
 ## Agent skills
 
 ### Issue tracker
