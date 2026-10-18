@@ -6,13 +6,13 @@ on:
 
 jobs:
   triage:
-    if: contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+    if: |
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
+      !endsWith(github.actor, '[bot]')
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
-      pull-requests: read
-      issues: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -24,7 +24,8 @@ jobs:
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
         with:
-          model: opencode/kimi-k3
+          model: opencode/deepseek-v4.1-flash
+          share: false
           prompt: |
             Ты разбираешь новую задачу в сервисе бронирования звонков. Прочитай AGENTS.md, GLOSSARY.md и docs/adr/. Оставь ОДИН комментарий по-русски:
             1) суть проблемы своими словами;

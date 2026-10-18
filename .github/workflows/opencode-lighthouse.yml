@@ -11,12 +11,12 @@ concurrency:
 
 jobs:
   lighthouse:
+    if: "!endsWith(github.actor, '[bot]')"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
       id-token: write
-      contents: write
-      pull-requests: write
+      contents: read
       issues: write
     steps:
       - name: Checkout repository
@@ -105,7 +105,8 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # issue этим токеном не триггерит opencode-triage — так и задумано
         with:
-          model: opencode/kimi-k3
+          model: opencode/deepseek-v4.1-flash
+          share: false
           prompt: |
             Ты разбираешь ночной отчёт Lighthouse сервиса бронирования звонков. Прочитай lighthouse/summary.md (при необходимости — JSON в lighthouse/), AGENTS.md и GLOSSARY.md. Сделай так:
             1) Найди открытый issue с заголовком, начинающимся с "Lighthouse-отчёт". Если есть — добавь в него комментарий с отчётом за сегодня; если нет — создай issue "Lighthouse-отчёт YYYY-MM-DD".
