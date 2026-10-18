@@ -30,13 +30,7 @@ pnpm workspace, запускать из корня (Node >= 24.21, см. `.nvmrc
 
 ## Агент в GitHub
 
-OpenCode-агент вызывается комментарием `/oc` в issue или PR — срабатывает только для владельца и коллабораторов репозитория (проверка `author_association` в условии job'а). Воркфлоу: `.github/workflows/opencode.yml`, модель задаётся в нём.
-
-Новые issues от владельца/коллабораторов автоматически разбирает `.github/workflows/opencode-triage.yml`.
-
-Pull request автоматически ревьюит `.github/workflows/opencode-review.yml`: ревьюятся PR из веток этого репозитория, включая PR агента; форки и release-PR пропускаются. Ревью запускается на opened/reopened/ready_for_review (без synchronize, экономия бюджета OpenCode) — повторное ревью вызывается reopen'ом PR.
-
-Ежедневно в 03:00 МСК и вручную (workflow_dispatch) `.github/workflows/opencode-lighthouse.yml` проверяет `vars.APP_URL` через Lighthouse, отчёт — артефакт `lighthouse-report` и issue «Lighthouse-отчёт».
+Четыре воркфлоу `.github/workflows/opencode*.yml`: `/oc` в комментариях, автотриаж новых issues, авторевью PR (без synchronize, повтор — reopen'ом), ночной Lighthouse. Модели, права, защита от петель и расходы — в разделе «Агент в GitHub» в [README.md](README.md#агент-в-github), здесь не дублируются.
 
 ## Agent skills
 
