@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/ksv2005/ai-for-developers-project-387/compare/ai-for-developers-project-387-v1.2.0...ai-for-developers-project-387-v1.2.1) (2026-10-18)
+
+
+### Bug Fixes
+
+* reject whitespace-only guest names and event type titles ([f93cb07](https://github.com/ksv2005/ai-for-developers-project-387/commit/f93cb07de229583096118dfccc680a352cfcb6e1))
+* **web:** label past busy slots as past instead of booked ([#13](https://github.com/ksv2005/ai-for-developers-project-387/issues/13)) ([cf4ca15](https://github.com/ksv2005/ai-for-developers-project-387/commit/cf4ca15ed3d5ed8ccab3034838a90704b79c0e80))
+
 ## [1.2.0](https://github.com/ksv2005/ai-for-developers-project-386/compare/ai-for-developers-project-386-v1.1.0...ai-for-developers-project-386-v1.2.0) (2026-10-15)
 
 
