@@ -1,0 +1,112 @@
+name: opencode-lighthouse
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # ежедневно в 03:00 МСК = 00:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: lighthouse
+  cancel-in-progress: false
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Wait for the app to wake up
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APP_URL}" ]; then
+            echo "::error::Переменная vars.APP_URL не задана — добавьте её в Settings → Secrets and variables → Actions → Variables."
+            exit 1
+          fi
+          echo "Ждём ${APP_URL}/api/health (Render free засыпает, прогрев до ~2 минут)..."
+          for attempt in $(seq 1 24); do
+            status=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "${APP_URL}/api/health" || true)
+            if [ "${status}" = "200" ]; then
+              echo "Приложение отвечает (HTTP 200) после попытки ${attempt}."
+              exit 0
+            fi
+            echo "Попытка ${attempt}/24: HTTP ${status:-нет ответа}, ждём 5 секунд..."
+            sleep 5
+          done
+          echo "::error::${APP_URL}/api/health не ответил HTTP 200 за 2 минуты."
+          exit 1
+
+      - name: Run Lighthouse
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          set -euo pipefail
+          mkdir -p lighthouse
+          for page in book admin; do
+            npx --yes lighthouse@13.5.0 \
+              "${APP_URL}/${page}" \
+              --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --output=json --output=html \
+              --output-path="./lighthouse/${page}" \
+              --quiet
+          done
+          ls -la lighthouse/
+
+      - name: Build summary.md
+        run: |
+          set -euo pipefail
+          {
+            echo "# Сводка Lighthouse"
+            echo
+            echo "Прогон: $(date -u '+%Y-%m-%d %H:%M UTC')"
+            for page in book admin; do
+              file="lighthouse/${page}.report.json"
+              echo
+              echo "## Страница /${page}"
+              echo
+              echo "| Категория | Оценка |"
+              echo "|---|---|"
+              jq -r '.categories | to_entries[] | "| \(.value.title) | \((.value.score // 0) * 100 | round) |"' "${file}"
+              echo
+              echo "### Проваленные аудиты (оценка < 90, худшие первыми)"
+              echo
+              jq -r '
+                [ .audits | to_entries[]
+                  | select(.value.score != null and .value.score < 0.9)
+                ] | sort_by(.score) | .[0:10][]
+                | "- **\(.key)** — \(.value.title)\(if .value.displayValue then " (\(.value.displayValue))" else "" end)"
+              ' "${file}"
+            done
+          } > lighthouse/summary.md
+          cat lighthouse/summary.md
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: ./lighthouse/
+          retention-days: 14
+
+      - name: Analyze report with OpenCode
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
+        with:
+          model: opencode/kimi-k3
+          prompt: |
+            Ты разбираешь ночной отчёт Lighthouse сервиса бронирования звонков. Прочитай lighthouse/summary.md (при необходимости — JSON в lighthouse/), AGENTS.md и GLOSSARY.md. Сделай так:
+            1) Найди открытый issue с заголовком, начинающимся с "Lighthouse-отчёт". Если есть — добавь в него комментарий с отчётом за сегодня; если нет — создай issue "Lighthouse-отчёт YYYY-MM-DD".
+            2) В отчёте: оценки по страницам и категориям, 3–5 главных находок с причиной, затронутыми файлами в apps/web и предлагаемым исправлением, ссылка на прогон ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} и имя артефакта lighthouse-report.
+            3) Отдели проблемы приложения от эффектов хостинга (холодный старт Render free).
+            Код не меняй, веток и PR не создавай, отдельные issues на находки не заводи.
