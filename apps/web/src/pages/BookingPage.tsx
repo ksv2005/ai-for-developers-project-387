@@ -254,7 +254,8 @@ function SlotPicker({ owner, eventType, slots, now }: SlotPickerProps) {
                 const free = slot.status === 'free';
                 // Статус от API авторитетен: free не перекрашивается по часам
                 // браузера; busy с наступившим началом — прошедший, а не занятый.
-                const past = !free && Date.parse(slot.start) < now.getTime();
+                // Граница нестрогая (start <= now) — как в API (apps/api/src/slots.ts).
+                const past = !free && Date.parse(slot.start) <= now.getTime();
                 const time = formatTime(slot.start, tz);
                 const label = free ? 'Свободно' : past ? 'Прошло' : 'Занято';
                 return (

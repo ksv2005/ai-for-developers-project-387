@@ -150,7 +150,8 @@ describe('slot picker', () => {
     expect(dayButton('15 октября, 7 св.').getAttribute('aria-pressed')).toBe(
       'true',
     );
-    const busy = screen.getByRole('button', { name: /09:00\s*Занято/ });
+    // 09:00 начинается ровно сейчас — «Прошло»; будущий занятый 10:00 — «Занято».
+    const busy = screen.getByRole('button', { name: /10:00\s*Занято/ });
     expect((busy as HTMLButtonElement).disabled).toBe(true);
     const free = screen.getByRole('button', { name: /11:00\s*Свободно/ });
     expect((free as HTMLButtonElement).disabled).toBe(false);
@@ -193,6 +194,20 @@ describe('slot picker', () => {
       name: /10:00\s*Свободно/,
     }) as HTMLButtonElement;
     expect(pastButFree.disabled).toBe(false);
+  });
+
+  it('labels a busy slot starting exactly now as "Прошло"', async () => {
+    // Время браузера (09:00 МСК) ровно равно началу Слота — как в API: start <= now.
+    const slots = moscowSlots(
+      (date, hhmm) => date === '2026-10-15' && hhmm === '09:00',
+    );
+    renderApp('/book/consultation', routesWith(slots));
+    await screen.findByRole('heading', { name: 'Выбор времени' });
+
+    const past = screen.getByRole('button', {
+      name: /09:00\s*Прошло/,
+    }) as HTMLButtonElement;
+    expect(past.disabled).toBe(true);
   });
 
   it('enables Continue only after picking a free slot and shows it in the summary with the zone', async () => {
