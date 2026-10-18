@@ -22,7 +22,7 @@ pnpm workspace, запускать из корня (Node >= 24.21, см. `.nvmrc
 Сообщения коммитов — по спецификации [Conventional Commits](https://www.conventionalcommits.org/): `<тип>[(область)][!]: <описание>`.
 
 - Типы: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
-- Описание — в повелительном наклонении, строчными буквами, без точки в конце
+- Описание — на английском, в повелительном наклонении, строчными буквами, без точки в конце (пример: `fix: reject whitespace-only names`, а не `fix: запрет имён`); это правило действует и для коммитов, и для заголовков PR, которые делает агент
 - Критические изменения: `!` после типа или футер `BREAKING CHANGE:`
 - Примеры: `feat: add booking endpoint`, `fix(api): return 404 for unknown routes`
 
@@ -33,6 +33,8 @@ pnpm workspace, запускать из корня (Node >= 24.21, см. `.nvmrc
 OpenCode-агент вызывается комментарием `/oc` в issue или PR — срабатывает только для владельца и коллабораторов репозитория (проверка `author_association` в условии job'а). Воркфлоу: `.github/workflows/opencode.yml`, модель задаётся в нём.
 
 Новые issues от владельца/коллабораторов автоматически разбирает `.github/workflows/opencode-triage.yml`.
+
+Pull request автоматически ревьюит `.github/workflows/opencode-review.yml`.
 
 ## Agent skills
 
