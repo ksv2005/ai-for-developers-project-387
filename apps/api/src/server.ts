@@ -1,0 +1,25 @@
+import { buildApp } from './app.js';
+import { loadConfig } from './config.js';
+
+const { port, host, staticDir, ownerTz, ownerName } = loadConfig();
+const app = buildApp({ staticDir, ownerTz, ownerName });
+
+try {
+  await app.listen({ port, host });
+} catch (err) {
+  app.log.error(err);
+  process.exit(1);
+}
+
+for (const signal of ['SIGTERM', 'SIGINT'] as const) {
+  process.once(signal, () => {
+    app.log.info({ signal }, 'shutting down');
+    app.close().then(
+      () => process.exit(0),
+      (err: unknown) => {
+        app.log.error(err);
+        process.exit(1);
+      },
+    );
+  });
+}

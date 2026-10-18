@@ -1,0 +1,37 @@
+{
+  "name": "ai-for-developers-project-386",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.11.2",
+  "engines": {
+    "node": ">=24.21.0"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "generate": "pnpm --filter contract build && pnpm --filter api-client generate && prettier --write packages/contract/openapi.yaml",
+    "generate:check": "pnpm generate && git diff --exit-code -- packages/contract/openapi.yaml packages/api-client/src/schema.d.ts",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "build": "pnpm -r build",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "test:e2e": "pnpm build && pnpm --filter e2e test",
+    "docker:build": "docker build -t ai-for-developers-project-386:local .",
+    "docker:run": "docker run --rm -p 3000:3000 ai-for-developers-project-386:local"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "prettier": "3.9.9",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.1",
+    "vitest": "^5.0.3"
+  },
+  "version": "1.2.0"
+}
