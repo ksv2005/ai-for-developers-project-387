@@ -298,6 +298,8 @@ components:
         guestName:
           type: string
           minLength: 1
+          pattern: .*\S.*
+          description: Имя должно содержать хотя бы один непробельный символ.
         guestEmail:
           type: string
           format: email
@@ -341,6 +343,8 @@ components:
           type: string
           minLength: 1
           maxLength: 100
+          pattern: .*\S.*
+          description: Название должно содержать хотя бы один непробельный символ.
         description:
           type: string
           default: ''
@@ -366,6 +370,8 @@ components:
           type: string
           minLength: 1
           maxLength: 100
+          pattern: .*\S.*
+          description: Название должно содержать хотя бы один непробельный символ.
         description:
           type: string
           default: ''

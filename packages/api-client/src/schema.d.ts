@@ -159,6 +159,7 @@ export interface components {
              * @description Начало Слота.
              */
             start: string;
+            /** @description Имя должно содержать хотя бы один непробельный символ. */
             guestName: string;
             /** Format: email */
             guestEmail: string;
@@ -179,6 +180,7 @@ export interface components {
         /** @description Создание Типа события: id задаёт Владелец. */
         EventTypeCreate: {
             id: components["schemas"]["EventTypeId"];
+            /** @description Название должно содержать хотя бы один непробельный символ. */
             title: string;
             /** @default  */
             description: string;
@@ -189,6 +191,7 @@ export interface components {
         EventTypeId: string;
         /** @description Изменение Типа события: id не меняется и в теле не принимается. */
         EventTypeUpdate: {
+            /** @description Название должно содержать хотя бы один непробельный символ. */
             title: string;
             /** @default  */
             description: string;

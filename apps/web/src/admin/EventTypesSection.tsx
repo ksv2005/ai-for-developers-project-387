@@ -196,6 +196,10 @@ function EventTypeForm({
     event.preventDefault();
     setErrors({});
     setFormError(null);
+    if (title.trim() === '') {
+      setErrors({ title: FIELD_MESSAGES.title });
+      return;
+    }
     setPending(true);
     const fields = { title, description, durationMinutes: Number(duration) };
     try {

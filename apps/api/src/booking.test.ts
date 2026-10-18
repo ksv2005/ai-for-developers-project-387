@@ -96,6 +96,53 @@ describe('booking API', () => {
       expect(response.statusCode).toBe(400);
     });
 
+    it.each([' ', '   ', '\t'])(
+      'rejects a whitespace-only title %j with 400',
+      async (title) => {
+        const response = await app.inject({
+          method: 'POST',
+          url: '/api/event-types',
+          payload: { id: 'a', title, durationMinutes: 30 },
+        });
+        expect(response.statusCode).toBe(400);
+        expect(
+          (await app.inject({ method: 'GET', url: '/api/event-types' })).json(),
+        ).toEqual([]);
+      },
+    );
+
+    it('rejects a whitespace-only title on update and keeps the type unchanged', async () => {
+      await createType({ id: 'intro' });
+      const response = await app.inject({
+        method: 'PUT',
+        url: '/api/event-types/intro',
+        payload: { title: '   ', durationMinutes: 60 },
+      });
+      expect(response.statusCode).toBe(400);
+      expect(
+        (await app.inject({ method: 'GET', url: '/api/event-types' })).json(),
+      ).toEqual([
+        { id: 'intro', title: 'Intro', description: '', durationMinutes: 30 },
+      ]);
+    });
+
+    it('trims edge whitespace from the title on create and update', async () => {
+      await createType({ id: 'intro', title: '  Анна  ' });
+      expect(
+        (await app.inject({ method: 'GET', url: '/api/event-types' })).json(),
+      ).toEqual([
+        { id: 'intro', title: 'Анна', description: '', durationMinutes: 30 },
+      ]);
+
+      const updated = await app.inject({
+        method: 'PUT',
+        url: '/api/event-types/intro',
+        payload: { title: '  Deep dive  ', durationMinutes: 60 },
+      });
+      expect(updated.statusCode).toBe(200);
+      expect(updated.json()).toMatchObject({ title: 'Deep dive' });
+    });
+
     it('rejects an already taken event type id with 409', async () => {
       await createType({ id: 'intro' });
       const response = await app.inject({
@@ -277,6 +324,48 @@ describe('booking API', () => {
         ...data,
       });
       expect(response.statusCode).toBe(400);
+    });
+
+    it.each([' ', '   ', '\t'])(
+      'rejects a whitespace-only guestName %j with 400 and keeps the slot free',
+      async (guestName) => {
+        const { id } = await createType({ durationMinutes: 30 });
+        const response = await book({
+          eventTypeId: id,
+          start: '2026-10-16T09:00:00.000Z',
+          guestName,
+          guestEmail: 'ann@example.com',
+        });
+        expect(response.statusCode).toBe(400);
+
+        const bookings = await app.inject({
+          method: 'GET',
+          url: '/api/admin/bookings',
+        });
+        expect(bookings.json()).toEqual([]);
+
+        const slots = (
+          await app.inject({
+            method: 'GET',
+            url: `/api/event-types/${id}/slots`,
+          })
+        ).json<{ start: string; status: string }[]>();
+        expect(
+          slots.find((s) => s.start === '2026-10-16T09:00:00.000Z')?.status,
+        ).toBe('free');
+      },
+    );
+
+    it('trims edge whitespace from the guest name', async () => {
+      const { id } = await createType({ durationMinutes: 30 });
+      const response = await book({
+        eventTypeId: id,
+        start: '2026-10-16T09:00:00.000Z',
+        guestName: '  Анна  ',
+        guestEmail: 'ann@example.com',
+      });
+      expect(response.statusCode).toBe(201);
+      expect(response.json()).toMatchObject({ guestName: 'Анна' });
     });
 
     it('rejects an invalid start with 400', async () => {
