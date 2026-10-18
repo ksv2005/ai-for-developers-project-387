@@ -12,6 +12,7 @@ concurrency:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       id-token: write
       contents: write
@@ -102,6 +103,7 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # issue этим токеном не триггерит opencode-triage — так и задумано
         with:
           model: opencode/kimi-k3
           prompt: |
@@ -110,3 +112,4 @@ jobs:
             2) В отчёте: оценки по страницам и категориям, 3–5 главных находок с причиной, затронутыми файлами в apps/web и предлагаемым исправлением, ссылка на прогон ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} и имя артефакта lighthouse-report.
             3) Отдели проблемы приложения от эффектов хостинга (холодный старт Render free).
             Код не меняй, веток и PR не создавай, отдельные issues на находки не заводи.
+            Для работы с issues используй gh CLI (токен в GH_TOKEN). Если команда gh падает — выведи ошибку и заверши работу, не жди и не ищи обходных путей.
