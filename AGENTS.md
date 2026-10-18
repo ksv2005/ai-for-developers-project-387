@@ -34,7 +34,7 @@ OpenCode-агент вызывается комментарием `/oc` в issue
 
 Новые issues от владельца/коллабораторов автоматически разбирает `.github/workflows/opencode-triage.yml`.
 
-Pull request автоматически ревьюит `.github/workflows/opencode-review.yml`.
+Pull request автоматически ревьюит `.github/workflows/opencode-review.yml`: ревьюятся PR из веток этого репозитория, включая PR агента; форки и release-PR пропускаются.
 
 ## Agent skills
 
