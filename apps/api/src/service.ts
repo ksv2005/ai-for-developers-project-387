@@ -59,7 +59,7 @@ export class Service {
     const { id, title, description = '', durationMinutes } = request.body;
     const created = this.repository.createEventType({
       id,
-      title,
+      title: title.trim(),
       description,
       durationMinutes,
     });
@@ -75,7 +75,7 @@ export class Service {
   ) => {
     const { title, description = '', durationMinutes } = request.body;
     const updated = this.repository.updateEventType(request.params.id, {
-      title,
+      title: title.trim(),
       description,
       durationMinutes,
     });
@@ -140,7 +140,7 @@ export class Service {
       durationMinutes: eventType.durationMinutes,
       start: slot.start,
       end: slot.end,
-      guestName,
+      guestName: guestName.trim(),
       guestEmail,
       note,
     });

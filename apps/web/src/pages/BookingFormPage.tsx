@@ -150,6 +150,10 @@ function BookingForm({ owner, eventType, start }: BookingFormProps) {
     event.preventDefault();
     setErrors({});
     setFormError(null);
+    if (guestName.trim() === '') {
+      setErrors({ guestName: FIELD_MESSAGES.guestName });
+      return;
+    }
     setPending(true);
     try {
       const result = await api.POST('/api/bookings', {

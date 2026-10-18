@@ -209,6 +209,26 @@ describe('booking form', () => {
     ).toBe('true');
   });
 
+  it('flags a whitespace-only name without sending the request', async () => {
+    const fetchMock = renderApp(formPath);
+    await fillForm('   ');
+    await submit();
+
+    const name = screen.getByLabelText('Имя');
+    await vi.waitFor(() =>
+      expect(name.getAttribute('aria-invalid')).toBe('true'),
+    );
+    expect(screen.getByText('Укажите имя')).toBeTruthy();
+    // Запрос не отправлен, введённые данные на месте.
+    expect(
+      fetchMock.mock.calls.map(([request]) => request.method),
+    ).not.toContain('POST');
+    expect((name as HTMLInputElement).value).toBe('   ');
+    expect((screen.getByLabelText('Email') as HTMLInputElement).value).toBe(
+      'anna@example.com',
+    );
+  });
+
   it('shows a server validation error next to the field on 400', async () => {
     renderApp(formPath, {
       '/api/bookings': () =>

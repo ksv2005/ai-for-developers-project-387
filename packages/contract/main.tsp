@@ -42,6 +42,8 @@ model EventType {
 model EventTypeCreate {
   id: EventTypeId;
 
+  /** Название должно содержать хотя бы один непробельный символ. */
+  @pattern(".*\\S.*")
   @minLength(1)
   @maxLength(100)
   title: string;
@@ -55,6 +57,8 @@ model EventTypeCreate {
 
 /** Изменение Типа события: id не меняется и в теле не принимается. */
 model EventTypeUpdate {
+  /** Название должно содержать хотя бы один непробельный символ. */
+  @pattern(".*\\S.*")
   @minLength(1)
   @maxLength(100)
   title: string;
@@ -89,6 +93,8 @@ model BookingCreate {
   /** Начало Слота. */
   start: utcDateTime;
 
+  /** Имя должно содержать хотя бы один непробельный символ. */
+  @pattern(".*\\S.*")
   @minLength(1)
   guestName: string;
 
