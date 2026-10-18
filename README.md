@@ -56,7 +56,7 @@ API стартует на порту 3000, web (Vite) — рядом; Vite пр�
 pnpm docker:build
 pnpm docker:run   # http://localhost:3000
 # или на другом порту
-docker run --rm -e PORT=10000 -p 10000:10000 ai-for-developers-project-386:local
+docker run --rm -e PORT=10000 -p 10000:10000 ai-for-developers-project-387:local
 ```
 
 ### Переменные окружения

@@ -1,5 +1,5 @@
 {
-  "name": "ai-for-developers-project-386",
+  "name": "ai-for-developers-project-387",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@12.11.2",
@@ -18,8 +18,8 @@
     "build": "pnpm -r build",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "test:e2e": "pnpm build && pnpm --filter e2e test",
-    "docker:build": "docker build -t ai-for-developers-project-386:local .",
-    "docker:run": "docker run --rm -p 3000:3000 ai-for-developers-project-386:local"
+    "docker:build": "docker build -t ai-for-developers-project-387:local .",
+    "docker:run": "docker run --rm -p 3000:3000 ai-for-developers-project-387:local"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
