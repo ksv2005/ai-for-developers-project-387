@@ -1,0 +1,38 @@
+name: opencode-review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false && github.event.pull_request.user.login != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: read
+      issues: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Run opencode
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          model: opencode/kimi-k3
+          use_github_token: true
+          prompt: |
+            Сделай ревью этого pull request по правилам AGENTS.md. Проверь:
+            1) соответствие связанному issue и его постановке;
+            2) типы TypeScript, явные ошибки и граничные случаи;
+            3) данные во web только через api-client, контракт меняется через packages/contract/main.tsp и pnpm generate;
+            4) есть тесты на изменённое поведение;
+            5) термины по GLOSSARY.md;
+            6) заголовок PR и коммиты по Conventional Commits из AGENTS.md.
+            Замечания к конкретным строкам оставляй комментариями к строкам, общий вывод — одним комментарием. Не пиши о том, что в порядке. Код не меняй.
